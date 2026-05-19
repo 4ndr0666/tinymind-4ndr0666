@@ -1,0 +1,25 @@
+{
+  "short_name": "Tinymind",
+  "name": "Tinymind",
+  "icons": [
+    {
+      "src": "icon-144.jpg",
+      "sizes": "144x144",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "icon.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ],
+  "orientation": "any",
+  "start_url": "/",
+  "theme_color": "#ffffff",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "description": "Turn GitHub into Your Blog & Thoughts Hub in Seconds.",
+  "scope": "/",
+  "apple-mobile-web-app-capable": "yes",
+  "apple-mobile-web-app-status-bar-style": "default"
+}
