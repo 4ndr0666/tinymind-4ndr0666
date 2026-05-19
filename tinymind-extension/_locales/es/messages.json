@@ -112,7 +112,7 @@
     "description": "Error when request times out"
   },
   "notAuthenticated": {
-    "message": "No autenticado. Por favor, inicia sesión en tinymind.me primero.",
+    "message": "No autenticado. Por favor, inicia sesión en tinymind-4ndr0666.vercel.app primero.",
     "description": "Error when not authenticated"
   },
   "from": {

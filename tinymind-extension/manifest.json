@@ -10,7 +10,7 @@
     "activeTab"
   ],
   "host_permissions": [
-    "https://tinymind.me/*"
+    "https://tinymind-4ndr0666.vercel.app/*"
   ],
   "action": {
     "default_popup": "popup/popup.html",

@@ -24,24 +24,24 @@ All your content is stored in **your own GitHub repository** (`yourusername/tiny
 
 ## Data Transmission
 
-- Data is transmitted securely via HTTPS to tinymind.me
-- tinymind.me uses your GitHub OAuth session to write to your repository
+- Data is transmitted securely via HTTPS to tinymind-4ndr0666.vercel.app
+- tinymind-4ndr0666.vercel.app uses your GitHub OAuth session to write to your repository
 - No data is sent to third parties
 
 ## Permissions Used
 
 | Permission | Purpose |
 |------------|---------|
-| `cookies` | Check if you're logged into tinymind.me (read-only, no cookies are created) |
+| `cookies` | Check if you're logged into tinymind-4ndr0666.vercel.app (read-only, no cookies are created) |
 | `contextMenus` | Add "Add to TinyMind thoughts" to right-click menu |
 | `activeTab` | Get page URL/title when saving a quote (only when you use the context menu) |
-| `host_permissions: tinymind.me` | Communicate with TinyMind API to save your content |
+| `host_permissions: tinymind-4ndr0666.vercel.app` | Communicate with TinyMind API to save your content |
 
 ## Third-Party Services
 
 This extension interacts with:
-- **tinymind.me** - To authenticate and save your content
-- **GitHub** - Where your content is ultimately stored (via tinymind.me)
+- **tinymind-4ndr0666.vercel.app** - To authenticate and save your content
+- **GitHub** - Where your content is ultimately stored (via tinymind-4ndr0666.vercel.app)
 
 ## Your Rights
 
@@ -57,7 +57,7 @@ We may update this privacy policy from time to time. Changes will be reflected i
 
 For questions or concerns about this privacy policy:
 - GitHub Issues: https://github.com/mazzzystar/tinymind/issues
-- Website: https://tinymind.me
+- Website: https://tinymind-4ndr0666.vercel.app
 
 ## Open Source
 

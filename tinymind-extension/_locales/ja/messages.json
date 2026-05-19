@@ -112,7 +112,7 @@
     "description": "Error when request times out"
   },
   "notAuthenticated": {
-    "message": "認証されていません。まずtinymind.meにログインしてください。",
+    "message": "認証されていません。まずtinymind-4ndr0666.vercel.appにログインしてください。",
     "description": "Error when not authenticated"
   },
   "from": {
