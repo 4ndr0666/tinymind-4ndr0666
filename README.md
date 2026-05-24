@@ -1,85 +1,160 @@
-<a href="https://tinymind.me/">
-  <img src="https://raw.githubusercontent.com/mazzzystar/tinymind/main/public/Tinymind-banner.png" alt="Tinymind Blog Banner">
-</a>
+<p align="center">
+  <img src="https://img.shields.io/badge/Next.js-14-black?logo=nextdotjs&style=for-the-badge" alt="Next.js">
+  <img src="https://img.shields.io/badge/TypeScript-Production-blue?logo=typescript&style=for-the-badge" alt="TypeScript">
+  <img src="https://img.shields.io/badge/GitHub-API-green?logo=github&style=for-the-badge" alt="GitHub API">
+  <img src="https://img.shields.io/badge/License-MIT-purple?style=for-the-badge" alt="License">
+</p>
 
-<a href="https://chromewebstore.google.com/detail/tinymind-quick-thoughts/gpfojneflmaoemniapdcgikfehpiocag">
-  <img src="https://img.shields.io/chrome-web-store/v/gpfojneflmaoemniapdcgikfehpiocag?label=Chrome%20Extension&logo=googlechrome&logoColor=white&style=for-the-badge" alt="Chrome Web Store">
-</a>
+<h1 align="center">TinyMind // Sovereign Information Architecture 🧠</h1>
 
-Turn your GitHub into a blog & memo data storage place with one-click Sign in. No server needed - every input automatically syncs to your GitHub repository.
-https://tinymind.me
+<p align="center">
+  <b>A decentralized document intelligence node.</b> <br>
+  Sync your cognitive stream directly to an immutable, private GitHub-hosted vault.
+</p>
 
-https://github.com/user-attachments/assets/4c9f590e-dd1e-4e9f-95a0-45b236752494
+<p align="center">
+  <img src="public/Tinymind-banner.png" alt="Tinymind Banner" width="860">
+</p>
 
-## Demo Page
-[tinymind.me/mazzzystar](https://tinymind.me/mazzzystar)
+---
 
-<img width="1188" alt="image" src="https://github.com/user-attachments/assets/2a74609d-da01-4085-ad9d-73b7825c4528">
+## 🧭 Table of Contents
 
-## Usage
-https://tinymind.me
+- [Architectural Flow](#-architectural-flow)
+- [Deployment Prerequisites](#-deployment-prerequisites)
+- [Environment Configuration](#-environment-configuration)
+- [Data Storage Schema](#-data-storage-schema)
+- [Client-Side Integration (Chrome)](#-client-side-integration-chrome)
+- [Distribution Models](#-distribution-models)
+- [Verification Checklist](#-verification-checklist)
+- [Troubleshooting](#-troubleshooting)
 
-MacOS version packaged using [Pake](https://github.com/tw93/Pake):
+---
 
-[<img width="128" alt="icon_512x512" src="https://github.com/user-attachments/assets/a6f82868-2d30-480c-b439-f158b5b389c9">](https://github.com/mazzzystar/tinymind/blob/main/public/Tinymind.dmg)
+## 🏗️ Architectural Flow
 
-### Chrome Extension
+<p align="center">
+  <img src="public/icon.png" alt="High-level Architecture" width="720">
+</p>
 
-Capture thoughts and quotes from anywhere in your browser.
+1.  **Input Vector:** Chrome Extension or Web Editor captures text/image blobs.
+2.  **Transport:** Secure transmission to Vercel-hosted API routes.
+3.  **Authentication:** NextAuth validates identity against the private GitHub instance.
+4.  **Committal:** The API executes a repository commit (JSON/Markdown) directly to the storage node.
+5.  **Rendering:** Client-side components ingest raw markdown and perform AST-safe rendering.
 
-[<img src="https://img.shields.io/chrome-web-store/v/gpfojneflmaoemniapdcgikfehpiocag?label=Install%20from%20Chrome%20Web%20Store&logo=googlechrome&logoColor=white&style=for-the-badge" alt="Install from Chrome Web Store">](https://chromewebstore.google.com/detail/tinymind-quick-thoughts/gpfojneflmaoemniapdcgikfehpiocag)
+---
 
-Features:
-- Quick popup editor with Markdown support
-- Right-click any selected text → "Add to TinyMind thoughts"
-- Drag & drop or paste images
-- Supports 20 languages
+## 🛠️ Deployment Prerequisites
 
-## How It Works
+### Hardware/Environment
+- Node.js `v18.0.0+`
+- Vercel-compatible CI/CD environment
+- GitHub account (Personal or Organization)
 
-1. You authorize Tinymind to read/write your public GitHub repositories.
-2. Tinymind immediately creates a public repository named `tinymind-blog` in your GitHub account.
-3. When you write anything on Tinymind, it automatically commits to your `yourname/tinymind-blog` repository.
+### Secrets Orchestration
+Define the following variables within your deployment environment (e.g., Vercel Project Settings):
 
-Your data is stored on your GitHub repository, separate from Tinymind.
+| Key | Purpose |
+| :--- | :--- |
+| `GITHUB_ID` | OAuth Client Identifier |
+| `GITHUB_SECRET` | OAuth Client Secret |
+| `NEXTAUTH_SECRET` | 32-Byte Salt/Hash Key |
+| `NEXTAUTH_URL` | Production Canonical Domain |
 
-## Data Privacy & Permissions
+---
 
-Your data remains secure:
+## 🔒 Security & Authentication
 
-- Stored directly in your GitHub repository
-- Only write access to public repositories
-- Full control via your GitHub account
+TinyMind implements **Zero-Trust Access**. The application never stores credentials; it requests a transient access token (JWT) via OAuth2.
 
-## Features
+- **Scopes:** The system specifically requests `repo` and `workflow` scopes.
+- **Privacy:** Data resides in a private repository; you retain 100% control over access lists.
+- **API Integrity:** All internal routes (`/api/github/*`) utilize `getServerSession` checks. If the session cookie is invalidated, read/write operations fail instantly.
 
-- [x] Blog and Thoughts support Markdown
-- [x] Add a feature to let writers manage their own blogs (add, delete, edit posts)
-- [x] Supports user drag-and-drop image uploads
-- [x] Shareable user main pages (e.g., [tinymind.me/mazzzystar](https://www.tinymind.me/mazzzystar))
-- [x] Chrome Extension to capture thoughts & quotes from anywhere
+---
 
-## Creator List
-If you use Tinymind for blogging or writing thoughts, feel free to comment below this issue(https://github.com/mazzzystar/tinymind/issues/18) to share your homepage URL for others to discover your work! 🎉
+## 📦 Data Storage Schema
 
-## Tech Stack
+### Thoughts
+Stored as a monolithic array in `content/thoughts.json`.
+```json
+{
+  "id": "1779161512136",
+  "content": "Raw markdown content...",
+  "timestamp": "2026-05-19T03:31:52.136Z"
+}
 
-Built with cutting-edge technologies:
+```
 
-- Next.js
-- React
-- TypeScript
-- NextAuth.js
-- Tailwind CSS
+### Blog Posts
 
-## Contribute
+Stored as individual Markdown files in `content/blog/`.
 
-We welcome contributions! Feel free to submit a Pull Request or open an issue for discussion.
+* **Parsing:** Handled via `MarkdownRenderer.tsx`.
+* **Frontmatter:** Supports standard Markdown frontmatter for post metadata.
 
-## Support
+---
 
-Report issues or suggestions: [New Issue](https://github.com/mazzzystar/tinymind/issues/new).
+## 🧩 Client-Side Integration (Chrome)
 
-## LICENSE
+The Chrome extension acts as an autonomous input agent.
 
-MIT License
+### Setup
+
+1. Clone the extension repository.
+2. Execute `npm install`.
+3. Load the `tinymind-extension/` directory into Chrome (`chrome://extensions` → Load Unpacked).
+4. **Environment Check:** Ensure the `API_BASE` constant in `background/service-worker.js` matches your production URL.
+
+### Security
+
+The extension requires **no API keys** to be stored locally. It utilizes `chrome.cookies` to establish an authenticated session with your Vercel instance, tunneling your browser's existing auth state.
+
+---
+
+## 🌍 Distribution Models
+
+### Model A: The Public-Facing Proxy (Read-Only)
+
+Allows users to read your content without giving them write-access to your data.
+
+1. Enable `PublicBlogList.tsx` and `PublicThoughtsList.tsx`.
+2. Share your public link (e.g., `https://[app-url]/[username]`).
+
+### Model B: The Sovereign Node Template (Forkable)
+
+Allows others to replicate your infrastructure for their own use.
+
+1. Make your repository public.
+2. Include a "Deploy to Vercel" button in this README.
+3. Users fork the repo, provide their own GitHub OAuth keys, and initialize their own private storage node.
+
+---
+
+## ✅ Verification Checklist
+
+* [ ] OAuth application registered with `repo` scope.
+* [ ] Vercel environment variables fully populated.
+* [ ] `content/thoughts.json` initialized as `[]` in the private repo.
+* [ ] Chrome extension manifest host permissions allow your domain.
+* [ ] Verified session persistence via `getServerSession`.
+
+---
+
+## 🛠️ Troubleshooting
+
+| Symptom | Diagnosis | Remediation |
+| --- | --- | --- |
+| `Client-side exception` | Markdown AST crash | Wrap content in Markdown code blocks (```text). |
+| `404 Not Found` | Repo scope issue | Regenerate OAuth token with `repo` permissions. |
+| `Unauthorized` | Session Expired | Log out and back in to refresh JWT. |
+| `Missing Data` | Schema Mismatch | Ensure `id` is a 13-digit string Epoch timestamp. |
+
+---
+
+*End of Core Directive. System operational.*
+
+```
+
+```
