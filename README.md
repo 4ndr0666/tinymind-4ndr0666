@@ -150,11 +150,3 @@ Allows others to replicate your infrastructure for their own use.
 | `404 Not Found` | Repo scope issue | Regenerate OAuth token with `repo` permissions. |
 | `Unauthorized` | Session Expired | Log out and back in to refresh JWT. |
 | `Missing Data` | Schema Mismatch | Ensure `id` is a 13-digit string Epoch timestamp. |
-
----
-
-*End of Core Directive. System operational.*
-
-```
-
-```
