@@ -79,11 +79,11 @@ export async function GET(
   const lang = getLocale(request);
   const translations = await loadTranslations(lang) as { HomePage?: { blogTitle?: string; blogShortTitle?: string; blogDescription?: string } };
     
-    let iconPath = '/icon.jpg'; // default fallback
+    let iconPath = '/icon-144.png'; // default fallback
     
     try {
       const { iconPath: userIconPath } = await getIconUrls(username);
-      iconPath = userIconPath || '/icon.jpg';
+      iconPath = userIconPath || '/icon-144.png';
     } catch {
       // Continue with default icon
     }
@@ -124,7 +124,7 @@ export async function GET(
       theme_color: '#000000',
       icons: [
         {
-          src: '/icon.jpg',
+          src: '/icon-144.png',
           sizes: '192x192',
           type: 'image/png'
         }

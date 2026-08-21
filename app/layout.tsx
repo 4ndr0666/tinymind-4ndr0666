@@ -111,7 +111,7 @@ export default async function RootLayout({
 }
 
 async function getIconPaths(accessToken: string | undefined) {
-  const defaultIconPath = "/icon.jpg";
+  const defaultIconPath = "/icon-144.png";
   const defaultAppleTouchIconPath = "/icon-144.jpg";
 
   if (accessToken) {

@@ -73,7 +73,7 @@ export async function generateMetadata({
 
     // Find the first image in the content
     const imageMatch = contentWithoutFrontmatter.match(/!\[.*?\]\((.*?)\)/);
-    let imageUrl = imageMatch ? imageMatch[1] : "/icon.jpg";
+    let imageUrl = imageMatch ? imageMatch[1] : "/icon-144.png";
 
     // If the image URL is relative, make it absolute
     if (imageUrl.startsWith("/")) {

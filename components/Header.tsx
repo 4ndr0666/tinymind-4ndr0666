@@ -21,7 +21,7 @@ export default function Header({
   const { data: session, status } = useSession();
   const pathname = usePathname();
   const t = useTranslations("HomePage");
-  const [avatarUrl, setAvatarUrl] = useState<string>("/icon.jpg");
+  const [avatarUrl, setAvatarUrl] = useState<string>("/icon-144.png");
 
   useEffect(() => {
     if (session?.accessToken) {
@@ -31,18 +31,18 @@ export default function Header({
         } else if (login) {
           setAvatarUrl(`https://github.com/${login}.png`);
         } else {
-          setAvatarUrl("/icon.jpg");
+          setAvatarUrl("/icon-144.png");
         }
       });
     } else if (propUsername) {
       setAvatarUrl(`https://github.com/${propUsername}.png`);
     } else {
-      setAvatarUrl("/icon.jpg");
+      setAvatarUrl("/icon-144.png");
     }
   }, [session, propUsername]);
 
   useEffect(() => {
-    if (iconUrl && iconUrl !== "/icon.jpg") {
+    if (iconUrl && iconUrl !== "/icon-144.png") {
       setAvatarUrl(iconUrl);
     }
   }, [iconUrl]);
