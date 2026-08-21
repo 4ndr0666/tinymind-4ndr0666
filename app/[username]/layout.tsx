@@ -5,7 +5,7 @@ import { getIconUrls } from "@/lib/githubApi";
 export async function generateMetadata({
   params,
 }: {
-  params: { username: string };
+  params: Promise<{ username: string }>;
 }): Promise<Metadata> {
   const { iconPath } = await getIconUrls(params.username);
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://tinymind.me";
@@ -65,8 +65,9 @@ export default async function UserLayout({
   params,
 }: {
   children: React.ReactNode;
-  params: { username: string };
+  params: Promise<{ username: string }>;
 }) {
+  const { username } = await params;
   const { iconPath } = await getIconUrls(params.username);
 
   return (

@@ -8,8 +8,9 @@ const blogCache = new BoundedCache<BlogPost[]>(100, 5 * 60 * 1000);
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { username: string } }
+  { params }: { params: Promise<{ username: string }> }
 ) {
+  const { username } = await params;
   const username = params.username;
   const cacheKey = `${username}/tinymind-blog`;
 

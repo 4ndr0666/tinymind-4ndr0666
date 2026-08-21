@@ -7,8 +7,9 @@ export const revalidate = 300; // Revalidate every 5 minutes
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { username: string } }
+  { params }: { params: Promise<{ username: string }> }
 ) {
+  const { username } = await params;
   // Add cache control headers
   const headers = {
     'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60',

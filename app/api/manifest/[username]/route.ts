@@ -61,8 +61,9 @@ async function loadTranslations(locale: string): Promise<unknown> {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { username: string } }
+  { params }: { params: Promise<{ username: string }> }
 ) {
+  const { username } = await params;
   try {
   const username = params.username;
     
