@@ -9,7 +9,6 @@ import { FaGithub } from "react-icons/fa";
 import ChromeIcon from "@/components/icons/ChromeIcon";
 import { useTranslations } from "next-intl";
 import { useEffect, useState, useMemo } from "react";
-import { getUserLogin } from "@/lib/githubApi";
 
 export default function Header({
   username: propUsername,
@@ -22,6 +21,7 @@ export default function Header({
   const pathname = usePathname();
   const t = useTranslations("HomePage");
 
+  // Initialize strictly with the default app icon unless a public profile dictates otherwise
   const [avatarUrl, setAvatarUrl] = useState<string>(
     iconUrl && !iconUrl.includes("gho_") && iconUrl !== "/icon-144.png"
       ? iconUrl
@@ -31,28 +31,14 @@ export default function Header({
   );
 
   useEffect(() => {
-    if (propUsername && !propUsername.startsWith("gho_")) {
+    if (iconUrl && iconUrl !== "/icon-144.png" && !iconUrl.includes("gho_")) {
+      setAvatarUrl(iconUrl);
+    } else if (propUsername && !propUsername.startsWith("gho_")) {
       setAvatarUrl(`https://github.com/${propUsername}.png`);
-    } else if (session?.user?.image) {
-      setAvatarUrl(session.user.image);
-    } else if (session?.accessToken) {
-      getUserLogin(session.accessToken).then((login) => {
-        if (login && !login.startsWith("gho_")) {
-          setAvatarUrl(`https://github.com/${login}.png`);
-        } else {
-          setAvatarUrl("/icon-144.png");
-        }
-      });
     } else {
       setAvatarUrl("/icon-144.png");
     }
-  }, [session, propUsername]);
-
-  useEffect(() => {
-    if (iconUrl && iconUrl !== "/icon-144.png" && !iconUrl.includes("gho_")) {
-      setAvatarUrl(iconUrl);
-    }
-  }, [iconUrl]);
+  }, [iconUrl, propUsername]);
 
   const isLoggedIn = !!session?.user && status === "authenticated";
   const isOnPublicProfilePage = !!propUsername;
@@ -106,9 +92,7 @@ export default function Header({
               alt="Home"
               width={32}
               height={32}
-              className={`rounded-full transition-opacity duration-300 ${
-                status === "loading" && !propUsername ? "opacity-0" : "opacity-100"
-              }`}
+              className="rounded-full"
             />
           </Link>
           {shouldShowTabs && (
