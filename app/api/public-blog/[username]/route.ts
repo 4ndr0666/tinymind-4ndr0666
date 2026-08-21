@@ -11,7 +11,6 @@ export async function GET(
   { params }: { params: Promise<{ username: string }> }
 ) {
   const { username } = await params;
-  const username = params.username;
   const cacheKey = `${username}/tinymind-blog`;
 
   try {

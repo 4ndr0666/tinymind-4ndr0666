@@ -65,7 +65,6 @@ export async function GET(
 ) {
   const { username } = await params;
   try {
-  const username = params.username;
     
     // Validate username
     if (!username || typeof username !== 'string' || username.trim() === '') {

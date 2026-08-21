@@ -16,7 +16,6 @@ export async function GET(
     'Content-Type': 'application/json',
   };
 
-  const username = params.username;
   
   // Use authenticated GitHub token for higher rate limits
   const githubToken = process.env.GITHUB_TOKEN;
