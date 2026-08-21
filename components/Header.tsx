@@ -21,7 +21,14 @@ export default function Header({
   const { data: session, status } = useSession();
   const pathname = usePathname();
   const t = useTranslations("HomePage");
-  const [avatarUrl, setAvatarUrl] = useState<string>("/icon-144.png");
+
+  const [avatarUrl, setAvatarUrl] = useState<string>(
+    iconUrl && !iconUrl.includes("gho_") && iconUrl !== "/icon-144.png"
+      ? iconUrl
+      : propUsername && !propUsername.startsWith("gho_")
+      ? `https://github.com/${propUsername}.png`
+      : "/icon-144.png"
+  );
 
   useEffect(() => {
     if (propUsername && !propUsername.startsWith("gho_")) {
@@ -99,7 +106,9 @@ export default function Header({
               alt="Home"
               width={32}
               height={32}
-              className="rounded-full"
+              className={`rounded-full transition-opacity duration-300 ${
+                status === "loading" && !propUsername ? "opacity-0" : "opacity-100"
+              }`}
             />
           </Link>
           {shouldShowTabs && (
