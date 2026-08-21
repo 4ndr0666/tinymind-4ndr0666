@@ -24,25 +24,25 @@ export default function Header({
   const [avatarUrl, setAvatarUrl] = useState<string>("/icon-144.png");
 
   useEffect(() => {
-    if (session?.accessToken) {
+    if (propUsername && !propUsername.startsWith("gho_")) {
+      setAvatarUrl(`https://github.com/${propUsername}.png`);
+    } else if (session?.user?.image) {
+      setAvatarUrl(session.user.image);
+    } else if (session?.accessToken) {
       getUserLogin(session.accessToken).then((login) => {
-        if (propUsername) {
-          setAvatarUrl(`https://github.com/${propUsername}.png`);
-        } else if (login) {
+        if (login && !login.startsWith("gho_")) {
           setAvatarUrl(`https://github.com/${login}.png`);
         } else {
           setAvatarUrl("/icon-144.png");
         }
       });
-    } else if (propUsername) {
-      setAvatarUrl(`https://github.com/${propUsername}.png`);
     } else {
       setAvatarUrl("/icon-144.png");
     }
   }, [session, propUsername]);
 
   useEffect(() => {
-    if (iconUrl && iconUrl !== "/icon-144.png") {
+    if (iconUrl && iconUrl !== "/icon-144.png" && !iconUrl.includes("gho_")) {
       setAvatarUrl(iconUrl);
     }
   }, [iconUrl]);
@@ -50,7 +50,6 @@ export default function Header({
   const isLoggedIn = !!session?.user && status === "authenticated";
   const isOnPublicProfilePage = !!propUsername;
 
-  // Memoize active tab calculation
   const activeTab = useMemo(() => {
     if (isOnPublicProfilePage) {
       if (pathname === `/${propUsername}/thoughts`) return "thoughts";
@@ -69,7 +68,6 @@ export default function Header({
     }
   }, [isOnPublicProfilePage, pathname, propUsername]);
 
-  // Memoize navigation URLs
   const navUrls = useMemo(() => {
     if (isOnPublicProfilePage) {
       return {
