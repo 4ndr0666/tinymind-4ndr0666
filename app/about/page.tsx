@@ -1,5 +1,4 @@
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { getAboutPage } from "@/lib/githubApi";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -26,7 +25,7 @@ interface CodeProps extends HTMLAttributes<HTMLElement> {
 }
 
 export default async function AboutPage() {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   const t = await getTranslations("HomePage");
 
   if (!session || !session.accessToken) {

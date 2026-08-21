@@ -1,5 +1,4 @@
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import BlogList from "@/components/BlogList";
 import { getBlogPosts } from "@/lib/githubApi";
 import GitHubSignInButton from "@/components/GitHubSignInButton";
@@ -7,7 +6,7 @@ import GitHubSignInButton from "@/components/GitHubSignInButton";
 export const revalidate = 60;
 
 export default async function BlogPage() {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
 
   if (!session || !session.accessToken) {
     return <GitHubSignInButton />;

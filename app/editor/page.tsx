@@ -1,5 +1,4 @@
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import EditorComponent from "@/components/Editor";
 import GitHubSignInButton from "@/components/GitHubSignInButton";
 
@@ -8,7 +7,7 @@ export default async function EditorPage({
 }: {
   searchParams: { type?: string };
 }) {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   const defaultType =
     searchParams.type === "blog"
       ? "blog"

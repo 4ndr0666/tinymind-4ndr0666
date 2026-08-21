@@ -11,12 +11,11 @@ import { Toaster } from "@/components/ui/toaster";
 import Head from "next/head";
 import CreateButton from "@/components/CreateButton";
 import { getIconUrls } from "@/lib/githubApi";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("metadata");
-  const session = await getServerSession(authOptions);
+  const session = await auth();
 
   const title =
     t("title") ||
@@ -71,7 +70,7 @@ export default async function RootLayout({
 }) {
   const locale = await getLocale();
   const messages = await getMessages();
-  const session = await getServerSession(authOptions);
+  const session = await auth();
 
   const { iconPath } = await getIconPaths(session?.accessToken);
 
