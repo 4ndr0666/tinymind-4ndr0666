@@ -5,7 +5,7 @@
   <img src="https://img.shields.io/badge/License-MIT-purple?style=for-the-badge" alt="License">
 </p>
 
-<h1 align="center">TinyMind // Sovereign Information Architecture 🧠</h1>
+<h1 align="center">TinyMind // Sovereign Information Architecture 🧠.</h1>
 
 <p align="center">
   <b>A decentralized document intelligence node.</b> <br>
