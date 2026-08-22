@@ -190,8 +190,7 @@ function generateSafeId(title: string): string {
     .toLowerCase()
     // Replace spaces and problematic characters with hyphens
     .replace(/\s+/g, '-')
-    // Remove characters that are not safe for file names, including Chinese punctuation
-    // Added Chinese punctuation: 《》？：。、，；''""（）【】〈〉「」『』！？
+    // Remove characters that are not safe for file names, including curly braces and Chinese punctuation
     .replace(/[<>:"/\\|?*.,;!@#$%^&*()+={}[\]`~《》？：。、，；''""（）【】〈〉「」『』！]/g, '')
     // Remove path traversal attempts
     .replace(/\.\./g, '')
