@@ -90,13 +90,13 @@ async function getRepoInfo(accessToken: string | undefined) {
 async function ensureRepoExists(octokit: Octokit, owner: string, repo: string) {
   try {
     const { data: repoData } = await octokit.repos.get({ owner, repo });
-    
+
     // Check if the repository description is empty.
     if (!repoData.description) {
       // Get the authenticated user's login
       const { data: userData } = await octokit.users.getAuthenticated();
       const userLogin = userData.login;
-      
+
       // Update the repository with the new description
       await octokit.repos.update({
         owner,
@@ -217,7 +217,7 @@ function generateSafeId(title: string): string {
 export async function getBlogPosts(accessToken: string): Promise<BlogPost[]> {
   const octokit = getOctokit(accessToken);
   const { owner, repo } = await getRepoInfo(accessToken);
-  
+
   try {
     const response = await octokit.repos.getContent({
       owner,
@@ -809,7 +809,7 @@ export async function getBlogPostsPublicFast(octokit: Octokit, owner: string, re
 
 export async function getBlogPostsPublic(octokit: Octokit, owner: string, repo: string): Promise<BlogPost[]> {
   const cacheKey = `blog-posts:${owner}:${repo}`;
-  
+
   // Check cache first
   const cachedData = apiCache.get<BlogPost[]>(cacheKey);
   if (cachedData) {
@@ -828,7 +828,7 @@ export async function getBlogPostsPublic(octokit: Octokit, owner: string, repo: 
     }
 
     const mdFiles = response.data.filter((file) => file.type === 'file' && file.name.endsWith('.md'));
-    
+
     // **PERFORMANCE OPTIMIZATION**: Fetch all files in parallel instead of sequentially
     const fetchPromises = mdFiles.map(async (file) => {
       try {
@@ -912,9 +912,9 @@ export async function getIconUrls(usernameOrAccessToken: string): Promise<{ icon
 
   // Validate input
   if (!usernameOrAccessToken || typeof usernameOrAccessToken !== 'string' || usernameOrAccessToken.trim() === '') {
-    return { 
-      iconPath: genericDefaultIconPath, 
-      appleTouchIconPath: genericDefaultAppleTouchIconPath 
+    return {
+      iconPath: genericDefaultIconPath,
+      appleTouchIconPath: genericDefaultAppleTouchIconPath
     };
   }
 
@@ -1026,7 +1026,7 @@ export async function createAboutPage(content: string, accessToken: string): Pro
   await initializeGitHubStructure(octokit, owner, repo);
 
   const path = 'content/about.md';
-  
+
   await octokit.repos.createOrUpdateFileContents({
     owner,
     repo,
@@ -1089,7 +1089,7 @@ export async function getAboutPagePublic(octokit: Octokit, owner: string, repo: 
 
 export async function getBlogPostsPublicLight(octokit: Octokit, owner: string, repo: string): Promise<BlogPost[]> {
   const cacheKey = `blog-posts-light:${owner}:${repo}`;
-  
+
   // Check cache first
   const cachedData = apiCache.get<BlogPost[]>(cacheKey);
   if (cachedData) {
@@ -1112,10 +1112,10 @@ export async function getBlogPostsPublicLight(octokit: Octokit, owner: string, r
 
     // Only fetch first few files to get some content, rest just metadata
     const MAX_FULL_CONTENT = 10; // Only fetch full content for first 10 posts
-    
+
     for (let i = 0; i < mdFiles.length; i++) {
       const file = mdFiles[i];
-      
+
       try {
         // Add small delay between requests
         if (i > 0) {
