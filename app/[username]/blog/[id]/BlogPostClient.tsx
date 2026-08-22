@@ -30,6 +30,11 @@ export default function BlogPostClient({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Guard clause: Prevent premature fetches during Next.js client hydration
+    if (!id || id === "undefined" || !username) {
+      return;
+    }
+
     const fetchPost = async () => {
       try {
         // Use the authenticated API endpoint instead of direct GitHub API
