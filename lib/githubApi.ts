@@ -352,8 +352,7 @@ export async function createBlogPost(
   const path = `content/blog/${newId}.md`;
   const date = new Date().toISOString(); // Store full ISO string
   const fullContent = `---
-title: ${title}
-date: ${date}
+title: "${title.replace(/\"/g, `\\\"`)}"\ndate: "${date}"
 ---
 
 ${content}`;
@@ -615,8 +614,7 @@ export async function updateBlogPost(
     const originalTitle = titleMatch ? titleMatch[1] : safeId;
 
     const updatedContent = `---
-title: ${title}
-date: ${date}
+title: "${title.replace(/\"/g, `\\\"`)}"\ndate: "${date}"
 ---
 
 ${content}`;
