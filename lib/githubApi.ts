@@ -1,3 +1,4 @@
+// Segment 1 of 1
 import { Octokit } from '@octokit/rest';
 import path from 'path';
 import { apiCache, BoundedCache } from './cache';
@@ -214,6 +215,33 @@ function generateSafeId(title: string): string {
   return id;
 }
 
+// Hardened parsing utility to safely extract YAML frontmatter
+function parseFrontmatter(content: string, fallbackId: string) {
+  let title = fallbackId;
+  let date = new Date().toISOString();
+
+  try {
+    const titleMatch = content.match(/title:\s*([^\r\n]+)/);
+    if (titleMatch && titleMatch[1]) {
+      // Strip quotes and trim whitespace safely
+      title = titleMatch[1].replace(/^["']|["']$/g, '').trim();
+    }
+
+    const dateMatch = content.match(/date:\s*([^\r\n]+)/);
+    if (dateMatch && dateMatch[1]) {
+      const rawDate = dateMatch[1].replace(/^["']|["']$/g, '').trim();
+      const parsedDate = new Date(rawDate);
+      if (!isNaN(parsedDate.getTime())) {
+        date = parsedDate.toISOString();
+      }
+    }
+  } catch (e) {
+    console.error("Error parsing frontmatter:", e);
+  }
+
+  return { title, date };
+}
+
 export async function getBlogPosts(accessToken: string): Promise<BlogPost[]> {
   const octokit = getOctokit(accessToken);
   const { owner, repo } = await getRepoInfo(accessToken);
@@ -242,17 +270,11 @@ export async function getBlogPosts(accessToken: string): Promise<BlogPost[]> {
 
             if ('content' in contentResponse.data) {
               const content = Buffer.from(contentResponse.data.content, 'base64').toString('utf-8');
-
-              // Parse the date from the content
-              const dateMatch = content.match(/date:\s*(.+)/);
-              const date = dateMatch ? new Date(dateMatch[1]).toISOString() : new Date().toISOString();
-
-              // Parse the title from the content (plain text, no URL decoding needed)
-              const titleMatch = content.match(/title:\s*(.+)/);
-              const title = titleMatch ? titleMatch[1].trim() : file.name.replace('.md', '');
+              const baseId = file.name.replace('.md', '');
+              const { title, date } = parseFrontmatter(content, baseId);
 
               return {
-                id: file.name.replace('.md', ''),
+                id: baseId,
                 title,
                 content,
                 date,
@@ -298,14 +320,7 @@ export async function getBlogPost(id: string, accessToken: string): Promise<Blog
     }
 
     const content = Buffer.from(contentResponse.data.content, 'base64').toString('utf-8');
-
-    // Parse the title from the content (plain text, no URL decoding needed)
-    const titleMatch = content.match(/title:\s*(.+)/);
-    const title = titleMatch ? titleMatch[1].trim() : id;
-
-    // Parse the date from the content
-    const dateMatch = content.match(/date:\s*(.+)/);
-    const date = dateMatch ? new Date(dateMatch[1]).toISOString() : new Date().toISOString();
+    const { title, date } = parseFrontmatter(content, id);
 
     return {
       id,
@@ -604,14 +619,7 @@ export async function updateBlogPost(
     }
 
     const existingContent = Buffer.from(currentFile.data.content, 'base64').toString('utf-8');
-
-    // Extract the original date from the existing content
-    const dateMatch = existingContent.match(/date:\s*(.+)/);
-    const date = dateMatch ? dateMatch[1] : new Date().toISOString();
-
-    // Extract the original title from the existing content
-    const titleMatch = existingContent.match(/title:\s*(.+)/);
-    const originalTitle = titleMatch ? titleMatch[1] : safeId;
+    const { title: originalTitle, date } = parseFrontmatter(existingContent, safeId);
 
     const updatedContent = `---
 title: "${title.replace(/\"/g, `\\\"`)}"\ndate: "${date}"
@@ -776,15 +784,15 @@ export async function getBlogPostsPublicFast(octokit: Octokit, owner: string, re
         });
 
         const content = Buffer.from(blobResponse.data.content, 'base64').toString('utf-8');
-        const titleMatch = content.match(/title:\s*(.+)/);
-        const dateMatch = content.match(/date:\s*(.+)/);
         const fileName = file.path.split('/').pop() || '';
+        const baseId = fileName.replace('.md', '');
+        const { title, date } = parseFrontmatter(content, baseId);
 
         return {
-          id: fileName.replace('.md', ''),
-          title: titleMatch ? titleMatch[1].trim() : fileName.replace('.md', ''),
+          id: baseId,
+          title,
           content,
-          date: dateMatch ? new Date(dateMatch[1]).toISOString() : new Date().toISOString(),
+          date,
         };
       } catch (error) {
         if (isDev) {
@@ -840,14 +848,14 @@ export async function getBlogPostsPublic(octokit: Octokit, owner: string, repo: 
 
         if ('content' in contentResponse.data) {
           const content = Buffer.from(contentResponse.data.content, 'base64').toString('utf-8');
-          const titleMatch = content.match(/title:\s*(.+)/);
-          const dateMatch = content.match(/date:\s*(.+)/);
+          const baseId = file.name.replace('.md', '');
+          const { title, date } = parseFrontmatter(content, baseId);
 
           return {
-            id: file.name.replace('.md', ''),
-            title: titleMatch ? titleMatch[1].trim() : file.name.replace('.md', ''),
+            id: baseId,
+            title,
             content,
-            date: dateMatch ? new Date(dateMatch[1]).toISOString() : new Date().toISOString(),
+            date,
           };
         }
         return null;
@@ -1132,14 +1140,14 @@ export async function getBlogPostsPublicLight(octokit: Octokit, owner: string, r
 
           if ('content' in contentResponse.data) {
             const content = Buffer.from(contentResponse.data.content, 'base64').toString('utf-8');
-            const titleMatch = content.match(/title:\s*(.+)/);
-            const dateMatch = content.match(/date:\s*(.+)/);
+            const baseId = file.name.replace('.md', '');
+            const { title, date } = parseFrontmatter(content, baseId);
 
             posts.push({
-              id: file.name.replace('.md', ''),
-              title: titleMatch ? titleMatch[1].trim() : file.name.replace('.md', ''),
+              id: baseId,
+              title,
               content,
-              date: dateMatch ? new Date(dateMatch[1]).toISOString() : new Date().toISOString(),
+              date,
             });
           }
         } else {
