@@ -1,5 +1,7 @@
 import { Metadata } from "next";
 import BlogPostClient from "./BlogPostClient";
+import { Octokit } from '@octokit/rest';
+import { getBlogPostsPublicFast } from '@/lib/githubApi';
 
 function decodeContent(content: string): string {
   try {
@@ -16,44 +18,30 @@ function removeFrontmatter(content: string): string {
   return content.replace(frontmatterRegex, "");
 }
 
-export default function PublicBlogPost({
+export default async function PublicBlogPost({
   params,
 }: {
-  params: { username: string; id: string };
+  params: Promise<{ username: string; id: string }>;
 }) {
-  return <BlogPostClient username={params.username} id={params.id} />;
+  const { username, id } = await params;
+  return <BlogPostClient username={username} id={id} />;
 }
 
 export async function generateMetadata({
   params,
 }: {
-  params: { username: string; id: string };
+  params: Promise<{ username: string; id: string }>;
 }): Promise<Metadata> {
-  const { username, id } = params;
+  const { username, id } = await params;
 
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+    // Architecturally sound direct execution to bypass self-referential Next.js routing failures
+    const githubToken = process.env.GITHUB_TOKEN || process.env.GITHUB_ACCESS_TOKEN;
+    const octokit = githubToken
+      ? new Octokit({ auth: githubToken })
+      : new Octokit();
 
-    // Use the secure API endpoint instead of direct GitHub API call
-    const response = await fetch(
-      `${baseUrl}/api/public-blog/${username}`,
-      {
-        next: { revalidate: 300 }, // 5 minutes cache
-        signal: AbortSignal.timeout(10000)
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
-
-    const posts: Array<{
-      id: string;
-      title: string;
-      content: string;
-      date: string;
-    }> = await response.json();
-
+    const posts = await getBlogPostsPublicFast(octokit, username, 'tinymind-blog');
     const post = posts.find((p) => p.id === decodeContent(id));
 
     if (!post) {
@@ -74,12 +62,16 @@ export async function generateMetadata({
 
     // Find the first image in the content
     const imageMatch = contentWithoutFrontmatter.match(/!\[.*?\]\((.*?)\)/);
-    let imageUrl = imageMatch ? imageMatch[1] : "/icon-144.png";
+    let imageUrl = imageMatch ? imageMatch[1] : "/icon.jpg";
 
     // If the image URL is relative, make it absolute
     if (imageUrl.startsWith("/")) {
-      imageUrl = `${baseUrl}${imageUrl}`;
+      imageUrl = `${
+        process.env.NEXT_PUBLIC_BASE_URL || "https://tinymind.me"
+      }${imageUrl}`;
     }
+
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://tinymind.me";
 
     return {
       title: post.title,
