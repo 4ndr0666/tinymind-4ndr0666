@@ -32,13 +32,14 @@ export async function generateMetadata({
   const { username, id } = params;
 
   try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+
     // Use the secure API endpoint instead of direct GitHub API call
     const response = await fetch(
-      `${
-        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
-      }/api/public-blog/${username}`,
+      `${baseUrl}/api/public-blog/${username}`,
       {
         next: { revalidate: 300 }, // 5 minutes cache
+        signal: AbortSignal.timeout(10000)
       }
     );
 
@@ -77,12 +78,8 @@ export async function generateMetadata({
 
     // If the image URL is relative, make it absolute
     if (imageUrl.startsWith("/")) {
-      imageUrl = `${
-        process.env.NEXT_PUBLIC_BASE_URL || "https://tinymind.me"
-      }${imageUrl}`;
+      imageUrl = `${baseUrl}${imageUrl}`;
     }
-
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://tinymind.me";
 
     return {
       title: post.title,

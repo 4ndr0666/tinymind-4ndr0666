@@ -33,7 +33,9 @@ export default function BlogPostClient({
     const fetchPost = async () => {
       try {
         // Use the authenticated API endpoint instead of direct GitHub API
-        const response = await fetch(`/api/public-blog/${username}`);
+        const response = await fetch(`/api/public-blog/${username}`, {
+          signal: AbortSignal.timeout(10000)
+        });
 
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
