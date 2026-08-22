@@ -22,7 +22,7 @@ export async function GET(
 
     // Use GitHub token if available, otherwise fallback to unauthenticated
     const githubToken = process.env.GITHUB_TOKEN || process.env.GITHUB_ACCESS_TOKEN;
-    const octokit = githubToken 
+    const octokit = githubToken
       ? new Octokit({ auth: githubToken })
       : new Octokit();
 
@@ -47,7 +47,7 @@ export async function GET(
     if (cached) {
       return NextResponse.json(cached);
     }
-    
+
     // Handle rate limiting
     if (error && typeof error === 'object' && 'status' in error && error.status === 403) {
       return NextResponse.json(
@@ -55,10 +55,10 @@ export async function GET(
         { status: 429 }
       );
     }
-    
+
     return NextResponse.json(
       { error: 'Failed to fetch blog posts' },
       { status: 500 }
     );
   }
-} 
+}
