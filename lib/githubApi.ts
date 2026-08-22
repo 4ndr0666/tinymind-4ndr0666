@@ -1,4 +1,3 @@
-// Segment 1 of 1
 import { Octokit } from '@octokit/rest';
 import path from 'path';
 import { apiCache, BoundedCache } from './cache';
@@ -366,8 +365,10 @@ export async function createBlogPost(
   const newId = generateSafeId(title);
   const path = `content/blog/${newId}.md`;
   const date = new Date().toISOString(); // Store full ISO string
+  const safeTitle = title.replace(/"/g, '\\"');
   const fullContent = `---
-title: "${title.replace(/\"/g, `\\\"`)}"\ndate: "${date}"
+title: "${safeTitle}"
+date: "${date}"
 ---
 
 ${content}`;
@@ -620,9 +621,11 @@ export async function updateBlogPost(
 
     const existingContent = Buffer.from(currentFile.data.content, 'base64').toString('utf-8');
     const { title: originalTitle, date } = parseFrontmatter(existingContent, safeId);
+    const safeTitle = title.replace(/"/g, '\\"');
 
     const updatedContent = `---
-title: "${title.replace(/\"/g, `\\\"`)}"\ndate: "${date}"
+title: "${safeTitle}"
+date: "${date}"
 ---
 
 ${content}`;
