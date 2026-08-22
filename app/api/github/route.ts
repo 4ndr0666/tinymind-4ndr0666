@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { deleteThought, createBlogPost, createThought, getBlogPosts, getThoughts, updateThought, deleteBlogPost, updateBlogPost, getBlogPost, getAboutPage, createAboutPage, updateAboutPage, uploadImage } from '@/lib/githubApi';
 import { createErrorResponse, ErrorCodes } from '@/lib/apiErrors';
 import { blogPostSchema, thoughtSchema, aboutPageSchema, blogIdSchema, thoughtIdSchema, apiActionSchema } from '@/lib/validation';
@@ -16,7 +15,7 @@ const headers = {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
 
     if (!session || !session.accessToken) {
       return NextResponse.json(
@@ -150,7 +149,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
 
     if (!session || !session.accessToken) {
       return NextResponse.json(
