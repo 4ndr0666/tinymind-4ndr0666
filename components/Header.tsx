@@ -22,6 +22,7 @@ export default function Header({
   const t = useTranslations("HomePage");
 
   // Pure derived state: Instantly resolves the correct avatar without secondary render flashes
+  // Preserves custom repository icons while falling back to session data securely
   const avatarUrl = useMemo(() => {
     if (iconUrl && iconUrl !== "/icon-144.png" && !iconUrl.includes("gho_")) {
       return iconUrl;
