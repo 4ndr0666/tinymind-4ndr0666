@@ -8,7 +8,7 @@ import { usePathname } from "next/navigation";
 import { FaGithub } from "react-icons/fa";
 import ChromeIcon from "@/components/icons/ChromeIcon";
 import { useTranslations } from "next-intl";
-import { useEffect, useState, useMemo } from "react";
+import { useMemo } from "react";
 
 export default function Header({
   username: propUsername,
@@ -21,24 +21,22 @@ export default function Header({
   const pathname = usePathname();
   const t = useTranslations("HomePage");
 
-  // Initialize strictly with the default app icon unless a public profile dictates otherwise
-  const [avatarUrl, setAvatarUrl] = useState<string>(
-    iconUrl && !iconUrl.includes("gho_") && iconUrl !== "/icon-144.png"
-      ? iconUrl
-      : propUsername && !propUsername.startsWith("gho_")
-      ? `https://github.com/${propUsername}.png`
-      : "/icon-144.png"
-  );
-
-  useEffect(() => {
+  // Pure derived state: Instantly resolves the correct avatar without secondary render flashes
+  const avatarUrl = useMemo(() => {
     if (iconUrl && iconUrl !== "/icon-144.png" && !iconUrl.includes("gho_")) {
-      setAvatarUrl(iconUrl);
-    } else if (propUsername && !propUsername.startsWith("gho_")) {
-      setAvatarUrl(`https://github.com/${propUsername}.png`);
-    } else {
-      setAvatarUrl("/icon-144.png");
+      return iconUrl;
     }
-  }, [iconUrl, propUsername]);
+    if (propUsername && !propUsername.startsWith("gho_")) {
+      return `https://github.com/${propUsername}.png`;
+    }
+    if (session?.user?.image) {
+      return session.user.image;
+    }
+    if (session?.user?.name) {
+      return `https://github.com/${session.user.name}.png`;
+    }
+    return "/icon-144.png";
+  }, [iconUrl, propUsername, session]);
 
   const isLoggedIn = !!session?.user && status === "authenticated";
   const isOnPublicProfilePage = !!propUsername;

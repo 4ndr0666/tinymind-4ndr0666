@@ -36,7 +36,11 @@ function removeFrontmatter(content: string): string {
   return content.replace(frontmatterRegex, "");
 }
 
-export default function BlogPost({ params }: { params: { id: string } }) {
+export default function BlogPost({ params }: { params: Promise<{ id: string }> }) {
+  // In Next.js 16, params in Client Components must be unwrapped using React.use()
+  const resolvedParams = React.use(params);
+  const id = resolvedParams.id;
+
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const router = useRouter();
@@ -47,6 +51,11 @@ export default function BlogPost({ params }: { params: { id: string } }) {
 
   useEffect(() => {
     const fetchPost = async () => {
+      // Guard against premature hydration fetches before the ID is injected
+      if (!id || id === "undefined") {
+        return;
+      }
+
       if (!session || !session.accessToken) {
         return <GitHubSignInButton />;
       }
@@ -55,7 +64,7 @@ export default function BlogPost({ params }: { params: { id: string } }) {
         // Use the encoded ID directly from the params
         // Decode the ID before sending it to the API
         const response = await fetch(
-          `/api/github?action=getBlogPost&id=${params.id}`
+          `/api/github?action=getBlogPost&id=${id}`
         );
         if (!response.ok) {
           throw new Error("Failed to fetch blog post");
@@ -72,7 +81,7 @@ export default function BlogPost({ params }: { params: { id: string } }) {
       }
     };
     fetchPost();
-  }, [params.id, router, session, status, toast, t]);
+  }, [id, router, session, status, toast, t]);
 
   const handleDeleteBlogPost = async () => {
     if (!session?.accessToken) {
@@ -89,7 +98,7 @@ export default function BlogPost({ params }: { params: { id: string } }) {
         },
         body: JSON.stringify({
           action: "deleteBlogPost",
-          id: params.id,
+          id: id,
         }),
       });
 
@@ -136,7 +145,7 @@ export default function BlogPost({ params }: { params: { id: string } }) {
       <Button
         variant="outline"
         size="sm"
-        onClick={() => router.push(`/editor?type=blog&id=${params.id}`)}
+        onClick={() => router.push(`/editor?type=blog&id=${id}`)}
       >
         <FiEdit className="h-4 w-4 mr-1" />
         {t("edit")}
