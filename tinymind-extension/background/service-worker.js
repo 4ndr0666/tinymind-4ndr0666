@@ -2,6 +2,7 @@
 // Handles API communication with tinymind-4ndr0666.vercel.app
 
 const API_BASE = 'https://tinymind-4ndr0666.vercel.app/api/github';
+const SESSION_API = 'https://tinymind-4ndr0666.vercel.app/api/auth/session';
 const REQUEST_TIMEOUT_MS = 30000; // 30 second timeout
 
 // Track badge timers by tab ID to prevent memory leaks
@@ -112,19 +113,38 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 });
 
 /**
- * Check if user is authenticated by looking for next-auth session cookie
+ * Check if user is authenticated using the server as the source of truth
  */
 async function checkAuthStatus() {
   try {
-    const cookies = await chrome.cookies.getAll({ domain: 'tinymind-4ndr0666.vercel.app' });
+    // Primary mechanism: Hit the NextAuth session endpoint directly.
+    // The browser will attach the correct cookies automatically via credentials: 'include'
+    const response = await fetchWithTimeout(SESSION_API, {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Accept': 'application/json'
+      }
+    }, 5000);
 
-    // next-auth uses different cookie names based on environment
-    // Production (HTTPS): __Secure-next-auth.session-token
-    // Development (HTTP): next-auth.session-token
-    const sessionCookie = cookies.find(c =>
-      c.name === 'next-auth.session-token' ||
-      c.name === '__Secure-next-auth.session-token'
-    );
+    if (response.ok) {
+      const session = await response.json();
+      // NextAuth returns an empty object if unauthenticated, or an object with a 'user' property if authenticated
+      if (session && Object.keys(session).length > 0 && session.user) {
+        return { isAuthenticated: true };
+      }
+    }
+  } catch (apiError) {
+    console.warn('Session API check failed, falling back to cookie inspection:', apiError);
+  }
+
+  try {
+    // Fallback mechanism: Check cookies manually.
+    // The trailing slash in the URL prevents Host-Only cookie omissions in Chrome.
+    const cookies = await chrome.cookies.getAll({ url: 'https://tinymind-4ndr0666.vercel.app/' });
+
+    // Use .includes to catch all NextAuth v4 and Auth.js v5 naming variants
+    const sessionCookie = cookies.find(c => c.name.includes('session-token'));
 
     return { isAuthenticated: !!sessionCookie };
   } catch (error) {
