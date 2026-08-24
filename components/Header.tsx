@@ -21,23 +21,18 @@ export default function Header({
   const pathname = usePathname();
   const t = useTranslations("HomePage");
 
-  // Pure derived state: Instantly resolves the correct avatar without secondary render flashes
-  // Preserves custom repository icons while falling back to session data securely
+  // Pure derived state: Restored strictly to the baseline logic.
+  // Prioritizes the custom iconUrl, then propUsername, falling back to default.
+  // This explicitly omits the session.user.image fallback to prevent the GitHub avatar from overriding custom icons.
   const avatarUrl = useMemo(() => {
     if (iconUrl && iconUrl !== "/icon-144.png" && !iconUrl.includes("gho_")) {
       return iconUrl;
-    }
-    if (propUsername && !propUsername.startsWith("gho_")) {
+    } else if (propUsername && !propUsername.startsWith("gho_")) {
       return `https://github.com/${propUsername}.png`;
+    } else {
+      return "/icon-144.png";
     }
-    if (session?.user?.image) {
-      return session.user.image;
-    }
-    if (session?.user?.name) {
-      return `https://github.com/${session.user.name}.png`;
-    }
-    return "/icon-144.png";
-  }, [iconUrl, propUsername, session]);
+  }, [iconUrl, propUsername]);
 
   const isLoggedIn = !!session?.user && status === "authenticated";
   const isOnPublicProfilePage = !!propUsername;
